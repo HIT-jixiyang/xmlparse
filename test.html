@@ -1,0 +1,178 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="css/index.css">
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<style type="text/css">
+    list-style:none;
+</style>
+<body>
+<script type="text/javascript">
+
+    text = "<response-body content-type='application/json'>" +
+        "    <headers>" +
+        "        <head>" +
+        "        </head>" +
+        "    </headers>" +
+        "    <body>" +
+        "        <item key='status' type='Integer' desc=''>200</item>" +
+        "        <item key='message' type='String' desc=''>success</item>" +
+        "        <item key='data' type='Object' desc=''>" +
+        "            <item key='yesterday' type='Object' desc=''>" +
+        "                <item key='date' type='String' desc=''>16日星期三</item>" +
+        "                <item key='high' type='String' desc=''>高温 28℃ </item>" +
+        "                <item key='fx' type='String' desc=''> 南风</item>" +
+        "                <item key='low' type='String' desc=''> 低温 21℃</item>" +
+        "                <item key='fl' type='String' desc=''> <![CDATA[<3级]]></item>" +
+        "                <item key='type' type='String' desc=''> 多云</item>" +
+        "            </item>" +
+        "            <item key='forcast' type='Array' >" +
+        "                <item key='date' type='String' desc='日期'>17日星期四</item>" +
+        "                <item key='high' type='String' desc='最高温度'>高温 25℃ </item>" +
+        "                <item key='fengxiang' type='String' desc='风向'> 南风</item>" +
+        "                <item key='low' type='String' desc='最低温度'> 低温 21℃</item>" +
+        "                <item key='fengli' type='String' desc='风力'> <![CDATA[<3级]]></item>" +
+        "                <item key='type' type='String' desc='天气状态'> 小雨</item>" +
+        "            </item>" +
+        "            <item key='city' type='String' desc='城市名称'> 北京</item>" +
+        "            <item key='aqi' type='String' desc='api'> 85</item>" +
+        "            <item key='wendu' type='String' desc='温度'> 22</item>" +
+        "            <item key='ganmao' type='String' desc='是否容易感冒'>相对今天出现了较大幅度降温，较易发生感冒，体质较弱的朋友请注意适当防护</item>" +
+        "        </item>" +
+        "    </body>" +
+        "" +
+        "</response-body>" ;
+
+    function getxmlDoc(text) {
+        try //Internet Explorer
+        {
+            xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+            xmlDoc.async = "false";
+            xmlDoc.loadXML(text);
+            return xmlDoc;
+        }
+        catch (e) {
+            try //Firefox, Mozilla, Opera, etc.
+            {
+                parser = new DOMParser();
+                xmlDoc = parser.parseFromString(text, "text/xml");
+                return xmlDoc;
+            }
+            catch (e) {
+                alert(e.message);
+            }
+        }
+    }
+
+    window.onload = function () {
+        var xmlDiv = document.getElementById("xmlrender")
+        var xmldoc = getxmlDoc(text);
+        console.log(xmldoc)
+        if (xmldoc != null) {
+            var x = xmldoc.documentElement;
+            // documentElement always represents the root node
+            var xmlDiv = document.getElementById("xmlrender")
+            showXml(xmlDiv, x);
+
+        }
+    }
+var nodeid=0;
+
+    function showXml(xmlDiv, node) {
+
+        if (node.nodeName != 'headers' && node.nodeName != 'querys' && node.nodeName != 'body' && node.nodeName != 'stand-request') {
+            console.log("       " + node.getAttribute("key") + ":" + node.textContent)
+            var ul = document.createElement('ul');
+
+        }
+        else {
+            console.log(node.nodeName);
+            var ul = document.createElement('ul');
+
+        }
+   ul.style='list-style-type:none';
+        //if (y<=0) return;
+        if (node.children.length > 0) {
+
+            var nodelist = node.children;
+            if (nodelist.length > 0) {
+                for (var i = 0; i < nodelist.length; i++) {
+
+                    var li = document.createElement('li');
+                    var anchor = document.createElement('a');
+
+                    var checkbox = document.createElement('input')
+                    var icon = document.createElement('i');
+                    var span = document.createElement('span');
+                    anchor.className = 'icon';
+                   if(nodelist[i].children.length>0){
+                       icon.className = 'glyphicon glyphicon-plus';
+                   }else {
+                       checkbox.style.marginLeft="14px";
+                   }
+                    checkbox.type = 'checkbox';
+                    anchor.appendChild(icon);
+                    anchor.appendChild(checkbox);
+
+                    if (nodelist[i].nodeName != 'headers' && nodelist[i].nodeName != 'querys' && nodelist[i].nodeName != 'body' && nodelist[i].nodeName != 'stand-request') {
+
+                        if(nodelist[i].children.length==0){
+                            nodeid++;
+                            anchor.appendChild(document.createTextNode(nodeid+"  "));
+                            span.appendChild(document.createTextNode(nodelist[i].getAttribute("key") + ":" + nodelist[i].textContent));
+                        }
+
+                    else {
+                            span.appendChild(document.createTextNode(nodelist[i].getAttribute("key")));
+                        }
+                    } else {
+                        span.appendChild(document.createTextNode(nodelist[i].nodeName));
+                    }
+                    anchor.appendChild(span);
+                    li.appendChild(anchor);
+                    ul.appendChild(li);
+                    showXml(li, nodelist[i]);
+                }
+                xmlDiv.appendChild(ul);
+            }
+        } else {
+            return;
+        }
+    }
+</script>
+<script>
+    /*    window.onload = function () {
+            var ul = document.createElement('ul');
+            ul.className = "hidden uiTree";
+            var li = document.createElement('li');
+            var anchor = document.createElement('a');
+            var checkbox = document.createElement('input')
+            var icon = document.createElement('i');
+            var span = document.createElement('span');
+            anchor.className = 'icon';
+            icon.className = 'glyphicon glyphicon-chevron-right';
+            checkbox.type = 'checkbox';
+            anchor.appendChild(checkbox);
+            anchor.appendChild(icon);
+            span.appendChild(document.createTextNode("key"));
+            anchor.appendChild(span);
+            li.appendChild(anchor);
+            ul.appendChild(li);
+            xmlDiv = document.getElementById("xmlrender")
+            xmlDiv.appendChild(ul);
+        }*/
+
+</script>
+<div class="container">
+
+    <div id="xmlrender" class="col-lg-8">
+
+    </div>
+</div>
+</body>
+
+</html>
